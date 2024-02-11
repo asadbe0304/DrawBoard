@@ -1,9 +1,15 @@
 import { Button } from "@/components/ui/button";
+import { UserButton } from "@clerk/nextjs";
 
 export default function Home() {
   return (
-    <Button size={"sm"}>
-      Click Board!
-    </Button>
+    <div className="flex flex-col gap-y-4">
+      <div>
+        this is screen Authenticated
+      </div>
+      <div>
+        <UserButton />
+      </div>
+    </div>
   );
 }
