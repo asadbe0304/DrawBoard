@@ -2,13 +2,17 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { MoreHorizontal } from "lucide-react";
+import { api } from "@/convex/_generated/api";
+import { useApiMutations } from "@/hooks/use-api-mutations";
 import { useAuth } from "@clerk/nextjs";
+import { toast } from "sonner";
 import { formatDistanceToNow } from 'date-fns'
+import { MoreHorizontal } from "lucide-react";
 import { Overlay } from "./overlay";
 import { Footer } from "./footer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Actions } from "@/components/actions";
+import { useMutation } from "convex/react";
 
 interface BoardCard {
   id: string;
@@ -21,12 +25,34 @@ interface BoardCard {
   isFavorite: string | boolean;
 }
 
-export const BoardCard = ({ id, title, authorId, authorName, createdAt, imageUrl, isFavorite }: BoardCard) => {
+export const BoardCard = ({ id, title, authorId, authorName, createdAt, imageUrl, isFavorite, orgId }: BoardCard) => {
   const { userId } = useAuth()
   const authorLabel = userId === authorId ? "You" : authorName;
   const createdAtLabel = formatDistanceToNow(createdAt, {
     addSuffix: true
   })
+
+  const handleFavorite = useMutation(api.board.favorite)
+
+  const {
+    mutate: onFavorite,
+    pending: pendingFavorite,
+  } = useApiMutations(api.board.favorite)
+  const {
+    mutate: onUnFavorite,
+    pending: pendingUnfavorite,
+  } = useApiMutations(api.board.unFavorite)
+
+ 
+  const toggleFavorite = () => {
+    if (isFavorite) {
+      onUnFavorite({ id })
+        .catch(() => toast.error("Failed to unfavorite"))
+    } else {
+      onFavorite({ id, orgId })
+        .catch(() => toast.error("Failed to favorite"))
+    }
+  };
 
   return (
     <Link href={`/board/${id}`}>
@@ -36,7 +62,7 @@ export const BoardCard = ({ id, title, authorId, authorName, createdAt, imageUrl
           <Overlay />
           <Actions id={id} side={'right'} title={title} >
             <button className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity px-3 py-2 outline-none ">
-              <MoreHorizontal  className="text-white opacity-75 hover:opacity-100 transition-opacity"/>
+              <MoreHorizontal className="text-white opacity-75 hover:opacity-100 transition-opacity" />
             </button>
           </Actions>
         </div>
@@ -45,10 +71,8 @@ export const BoardCard = ({ id, title, authorId, authorName, createdAt, imageUrl
           authorLabel={authorLabel}
           createdAtLabel={createdAtLabel}
           isFavorite={false}
-          onClick={() => {
-            console.log('l');
-          }}
-          disabled={false}
+          onClick={toggleFavorite}
+          disabled={pendingFavorite || pendingUnfavorite}
         />
       </div>
     </Link>
