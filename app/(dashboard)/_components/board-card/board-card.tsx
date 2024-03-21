@@ -22,7 +22,7 @@ interface BoardCard {
   createdAt: number;
   imageUrl: string;
   orgId: string;
-  isFavorite: string | boolean;
+  isFavorite: boolean;
 }
 
 export const BoardCard = ({ id, title, authorId, authorName, createdAt, imageUrl, isFavorite, orgId }: BoardCard) => {
@@ -32,7 +32,8 @@ export const BoardCard = ({ id, title, authorId, authorName, createdAt, imageUrl
     addSuffix: true
   })
 
-  const handleFavorite = useMutation(api.board.favorite)
+  // const handleFavorite = useMutation(api.board.favorite)
+  // const handleUnFavorite = useMutation(api.board.unFavorite)
 
   const {
     mutate: onFavorite,
@@ -43,7 +44,7 @@ export const BoardCard = ({ id, title, authorId, authorName, createdAt, imageUrl
     pending: pendingUnfavorite,
   } = useApiMutations(api.board.unFavorite)
 
- 
+
   const toggleFavorite = () => {
     if (isFavorite) {
       onUnFavorite({ id })
@@ -67,10 +68,10 @@ export const BoardCard = ({ id, title, authorId, authorName, createdAt, imageUrl
           </Actions>
         </div>
         <Footer
+          isFavorite={isFavorite}
           title={title}
           authorLabel={authorLabel}
           createdAtLabel={createdAtLabel}
-          isFavorite={false}
           onClick={toggleFavorite}
           disabled={pendingFavorite || pendingUnfavorite}
         />
