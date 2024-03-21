@@ -48,7 +48,16 @@ export const remove = mutation({
     }
 
     // todo later check to delete favorite relation as well
-
+    const userId = identity.subject;
+    const existingFavorite = await ctx.db
+      .query("userFavorites")
+      .withIndex("by_user_board", (q) =>
+        q.eq("userId", userId).eq("boardId", args.id)
+      )
+      .unique();
+    if (existingFavorite) {
+      await ctx.db.delete(existingFavorite._id);
+    }
     await ctx.db.delete(args.id);
   },
 });
@@ -94,10 +103,7 @@ export const favorite = mutation({
     const existingFavorite = await ctx.db
       .query("userFavorites")
       .withIndex("by_user_board_org", (q) =>
-        q
-        .eq("userId", userId)
-        .eq("boardId", board._id)
-        .eq("orgId", args.orgId)
+        q.eq("userId", userId).eq("boardId", board._id).eq("orgId", args.orgId)
       )
       .unique();
 
@@ -113,7 +119,7 @@ export const favorite = mutation({
   },
 });
 export const unFavorite = mutation({
-  args: { id: v.id("boards")},
+  args: { id: v.id("boards") },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
 
@@ -127,13 +133,12 @@ export const unFavorite = mutation({
     }
 
     const userId = identity.subject;
-    
+
     const existingFavorite = await ctx.db
       .query("userFavorites")
-      .withIndex("by_user_board", (q) =>
-        q
-        .eq("userId", userId)
-        .eq("boardId", board._id)
+      .withIndex(
+        "by_user_board",
+        (q) => q.eq("userId", userId).eq("boardId", board._id)
         // .eq("orgId", board.orgId)
       )
       .unique();
