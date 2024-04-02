@@ -1,50 +1,50 @@
 import { createClient } from "@liveblocks/client";
 import { createRoomContext, createLiveblocksContext } from "@liveblocks/react";
-  
+
 const client = createClient({
-  publicApiKey: "pk_dev_jnWk1Qphozjt4pc6gpFaUurMlWml2tCToXop1LXORBoAIXdVneYCldp4xVmhs6Yh",
-  // authEndpoint: "/api/liveblocks-auth",
+  authEndpoint: "/api/liveblocks-auth",
+  // publicApiKey: "pk_dev_jnWk1Qphozjt4pc6gpFaUurMlWml2tCToXop1LXORBoAIXdVneYCldp4xVmhs6Yh",
   // throttle: 100,
-  async resolveUsers({ userIds }) {
-    // Used only for Comments and Notifications. Return a list of user information
-    // retrieved from `userIds`. This info is used in comments, mentions etc.
-    
-    // const usersData = await __fetchUsersFromDB__(userIds);
-    // 
-    // return usersData.map((userData) => ({
-    //   name: userData.name,
-    //   avatar: userData.avatar.src,
-    // }));
-    
-    return [];
-  },
-  async resolveMentionSuggestions({ text }) {
-    // Used only for Comments. Return a list of userIds that match `text`.
-    // These userIds are used to create a mention list when typing in the
-    // composer. 
-    //
-    // For example when you type "@jo", `text` will be `"jo"`, and 
-    // you should to return an array with John and Joanna's userIds:
-    // ["john@example.com", "joanna@example.com"]
+  // async resolveUsers({ userIds }) {
+  //   // Used only for Comments and Notifications. Return a list of user information
+  //   // retrieved from `userIds`. This info is used in comments, mentions etc.
 
-    // const users = await getUsers({ search: text });
-    // return users.map((user) => user.id);
+  //   // const usersData = await __fetchUsersFromDB__(userIds);
+  //   //
+  //   // return usersData.map((userData) => ({
+  //   //   name: userData.name,
+  //   //   avatar: userData.avatar.src,
+  //   // }));
 
-    return [];
-  },
-  async resolveRoomsInfo({ roomIds }) {
-    // Used only for Comments and Notifications. Return a list of room information
-    // retrieved from `roomIds`.
-    
-    // const roomsData = await __fetchRoomsFromDB__(roomIds);
-    // 
-    // return roomsData.map((roomData) => ({
-    //   name: roomData.name,
-    //   url: roomData.url,
-    // }));
-    
-    return [];
-  },
+  //   return [];
+  // },
+  // async resolveMentionSuggestions({ text }) {
+  //   // Used only for Comments. Return a list of userIds that match `text`.
+  //   // These userIds are used to create a mention list when typing in the
+  //   // composer.
+  //   //
+  //   // For example when you type "@jo", `text` will be `"jo"`, and
+  //   // you should to return an array with John and Joanna's userIds:
+  //   // ["john@example.com", "joanna@example.com"]
+
+  //   // const users = await getUsers({ search: text });
+  //   // return users.map((user) => user.id);
+
+  //   return [];
+  // },
+  // async resolveRoomsInfo({ roomIds }) {
+  //   // Used only for Comments and Notifications. Return a list of room information
+  //   // retrieved from `roomIds`.
+
+  //   // const roomsData = await __fetchRoomsFromDB__(roomIds);
+  //   //
+  //   // return roomsData.map((roomData) => ({
+  //   //   name: roomData.name,
+  //   //   url: roomData.url,
+  //   // }));
+
+  //   return [];
+  // },
 });
 
 // Presence represents the properties that exist on every user in the Room
@@ -68,8 +68,11 @@ type Storage = {
 // provided by your own custom auth back end (if used). Useful for data that
 // will not change during a session, like a user's name or avatar.
 type UserMeta = {
-  // id?: string,  // Accessible through `user.id`
-  // info?: Json,  // Accessible through `user.info`
+  id?: string; // Accessible through `user.id`
+  info?: {
+    name?: string;
+    picture?: string;
+  }; // Accessible through `user.info`
 };
 
 // Optionally, the type of custom events broadcast and listened to in this
@@ -128,12 +131,14 @@ export const {
     useMarkThreadAsRead,
     useRoomNotificationSettings,
     useUpdateRoomNotificationSettings,
-  
+
     // These hooks can be exported from either context
     // useUser,
     // useRoomInfo
-  }
-} = createRoomContext<Presence, Storage, UserMeta, RoomEvent, ThreadMetadata>(client);
+  },
+} = createRoomContext<Presence, Storage, UserMeta, RoomEvent, ThreadMetadata>(
+  client
+);
 
 // Project-level hooks, use inside `LiveblocksProvider`
 export const {
@@ -143,9 +148,9 @@ export const {
     useMarkAllInboxNotificationsAsRead,
     useInboxNotifications,
     useUnreadInboxNotificationsCount,
-  
+
     // These hooks can be exported from either context
     useUser,
     useRoomInfo,
-  }
+  },
 } = createLiveblocksContext<UserMeta, ThreadMetadata>(client);
