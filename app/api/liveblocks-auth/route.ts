@@ -14,10 +14,10 @@ export async function POST(request: Request) {
   const authorization = await auth();
   const user = await currentUser();
 
-  console.log("Auth", {
-    authorization,
-    user,
-  });
+  // console.log("Auth", {
+  //   authorization,
+  //   user,
+  // });
 
   if (!authorization || !user) {
     return new Response("UnAuth", { status: 403 });
